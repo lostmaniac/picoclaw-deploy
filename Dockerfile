@@ -68,17 +68,18 @@ ENV PATH="/root/.nvm/versions/node/$(bash -c 'source $NVM_DIR/nvm.sh && nvm curr
 
 # 安装 picoclaw
 ARG PICOCLAW_VERSION=latest
-RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
-        ARCH="x86_64"; \
-    elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
-        ARCH="arm64"; \
+RUN ARCH=$(uname -m) && \
+    if [ "$ARCH" = "x86_64" ]; then \
+        DOWNLOAD_ARCH="x86_64"; \
+    elif [ "$ARCH" = "aarch64" ]; then \
+        DOWNLOAD_ARCH="arm64"; \
     else \
-        echo "Unsupported platform: $TARGETPLATFORM" && exit 1; \
+        echo "Unsupported architecture: $ARCH" && exit 1; \
     fi && \
-    echo "Installing picoclaw for platform: $ARCH" && \
+    echo "Installing picoclaw for platform: $ARCH (download: $DOWNLOAD_ARCH)" && \
     LATEST_VERSION=$(curl -s https://api.github.com/repos/sipeed/picoclaw/releases/latest | python3 -c "import sys, json; print(json.load(sys.stdin).get('tag_name', 'latest'))" 2>/dev/null || echo "latest") && \
     echo "Latest picoclaw version: $LATEST_VERSION" && \
-    DOWNLOAD_URL="https://github.com/sipeed/picoclaw/releases/download/${LATEST_VERSION}/picoclaw_Linux_${ARCH}.tar.gz" && \
+    DOWNLOAD_URL="https://github.com/sipeed/picoclaw/releases/download/${LATEST_VERSION}/picoclaw_Linux_${DOWNLOAD_ARCH}.tar.gz" && \
     echo "Downloading from: $DOWNLOAD_URL" && \
     curl -fsSL "$DOWNLOAD_URL" -o /tmp/picoclaw.tar.gz && \
     tar -xzf /tmp/picoclaw.tar.gz -C /tmp && \
