@@ -62,14 +62,14 @@ RUN touch "${BASH_ENV}" && \
     echo '. "${BASH_ENV}"' >> ~/.bashrc
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | PROFILE="${BASH_ENV}" bash
 RUN echo "node" > .nvmrc
-RUN /bin/bash -c '. "${BASH_ENV}" && nvm install --lts'
-RUN /bin/bash -c '. "${BASH_ENV}" && nvm use --lts'
-RUN /bin/bash -c '. "${BASH_ENV}" && nvm alias default node'
-RUN /bin/bash -c '. "${BASH_ENV}" && npm config set registry https://registry.npmmirror.com'
+RUN . "${BASH_ENV}" && nvm install --lts
+RUN . "${BASH_ENV}" && nvm use --lts
+RUN . "${BASH_ENV}" && nvm alias default node
+RUN . "${BASH_ENV}" && npm config set registry https://registry.npmmirror.com'
 
 # 设置Node.js环境变量
-ENV NODE_PATH="/root/.nvm/versions/node/$(/bin/bash -c '. "${BASH_ENV}" && nvm current')/lib/node_modules"
-ENV PATH="/root/.nvm/versions/node/$(/bin/bash -c '. "${BASH_ENV}" && nvm current')/bin:$PATH"
+ENV NODE_PATH="/root/.nvm/versions/node/$(. "${BASH_ENV}" && nvm current)/lib/node_modules"
+ENV PATH="/root/.nvm/versions/node/$(. "${BASH_ENV}" && nvm current)/bin:$PATH"
 
 # 安装 picoclaw
 ARG PICOCLAW_VERSION=latest
