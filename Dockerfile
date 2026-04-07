@@ -55,21 +55,18 @@ RUN mkdir -p /root/.ssh && touch /root/.ssh/authorized_keys && chmod 700 /root/.
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.cargo/bin:$PATH"
 
-# 安装nvm - 使用 bash_env 方式在 Docker 中
+# 安装nvm
 ENV NVM_DIR="/root/.nvm"
-ENV BASH_ENV="/root/.bash_env"
-RUN touch "${BASH_ENV}" && \
-    echo '. "${BASH_ENV}"' >> ~/.bashrc
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | PROFILE="${BASH_ENV}" bash
-RUN echo "node" > .nvmrc
-RUN . "${BASH_ENV}" && nvm install --lts
-RUN . "${BASH_ENV}" && nvm use --lts
-RUN . "${BASH_ENV}" && nvm alias default node
-RUN . "${BASH_ENV}" && npm config set registry https://registry.npmmirror.com'
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
+RUN /bin/bash -c '. ~/.nvm/nvm.sh && nvm install --lts'
+RUN /bin/bash -c '. ~/.nvm/nvm.sh && nvm use --lts'
+RUN /bin/bash -c '. ~/.nvm/nvm.sh && nvm alias default node'
+RUN /bin/bash -c '. ~/.nvm/nvm.sh && npm config set registry https://registry.npmmirror.com'
 
 # 设置Node.js环境变量
-ENV NODE_PATH="/root/.nvm/versions/node/$(. "${BASH_ENV}" && nvm current)/lib/node_modules"
-ENV PATH="/root/.nvm/versions/node/$(. "${BASH_ENV}" && nvm current)/bin:$PATH"
+ENV NODE_PATH="/root/.nvm/versions/node/$(/bin/bash -c '. ~/.nvm/nvm.sh && nvm current')/lib/node_modules"
+ENV PATH="/root/.nvm/versions/node/$(/bin/bash -c '. ~/.nvm/nvm.sh && nvm current')/bin:$PATH"
 
 # 安装 picoclaw
 ARG PICOCLAW_VERSION=latest
