@@ -48,15 +48,16 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends software-properties-common && \
     add-apt-repository universe -y && \
     apt-get update && \
-    apt-get install -y --no-install-recommends chromium-browser libgbm1 libxshmfence1 libnss3 libatk-bridge2.0-0 libdrm2 libxkbcommon0 libasound2 libatspi2.0-0 && \
+    apt-get install -y --no-install-recommends chromium libgbm1 libxshmfence1 libnss3 libatk-bridge2.0-0 libdrm2 libxkbcommon0 libasound2t64 libatspi2.0-0 && \
     rm -rf /var/lib/apt/lists/*
 
 # 配置Chromium为无头模式
-RUN chromium-browser --version && \
+RUN chromium --version && \
     echo "Chromium installed successfully"
 
 # 创建Chrome兼容性链接（为了兼容性）
-RUN ln -s /usr/bin/chromium-browser /usr/bin/google-chrome
+RUN ln -s /usr/bin/chromium /usr/bin/google-chrome && \
+    ln -s /usr/bin/chromium /usr/bin/chromium-browser
 
 # 配置SSH - 只允许密钥登录，禁用密码，启用SFTP
 RUN mkdir /var/run/sshd && \
