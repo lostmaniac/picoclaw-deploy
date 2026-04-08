@@ -25,9 +25,6 @@ RUN apt-get update && apt-get install -y \
     strace \
     jq \
     ca-certificates \
-    software-properties-common \
-    apt-transport-https \
-    gnupg \
     openssh-server \
     openssh-client \
     build-essential \
@@ -43,21 +40,14 @@ RUN apt-get update && apt-get install -y \
     eza \
     && rm -rf /var/lib/apt/lists/*
 
-# 确保启用 universe 仓库并更新软件源
+# 安装Chromium浏览器
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends software-properties-common && \
-    add-apt-repository universe -y && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends chromium libgbm1 libxshmfence1 libnss3 libatk-bridge2.0-0 libdrm2 libxkbcommon0 libasound2t64 libatspi2.0-0 && \
+    apt-get install -y --no-install-recommends chromium && \
     rm -rf /var/lib/apt/lists/*
 
-# 配置Chromium为无头模式
+# 验证Chromium安装
 RUN chromium --version && \
     echo "Chromium installed successfully"
-
-# 创建Chrome兼容性链接（为了兼容性）
-RUN ln -s /usr/bin/chromium /usr/bin/google-chrome && \
-    ln -s /usr/bin/chromium /usr/bin/chromium-browser
 
 # 配置SSH - 只允许密钥登录，禁用密码，启用SFTP
 RUN mkdir /var/run/sshd && \
