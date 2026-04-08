@@ -45,8 +45,9 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends chromium && \
     rm -rf /var/lib/apt/lists/*
 
-# 验证Chromium安装
-RUN chromium --version && \
+# 查找并验证Chromium安装位置
+RUN which chromium || (find /usr -name "chromium*" -type f 2>/dev/null | head -5 && echo "Found Chromium executables above") && \
+    (chromium-browser --version 2>/dev/null || chromium --version 2>/dev/null || /snap/bin/chromium --version 2>/dev/null) && \
     echo "Chromium installed successfully"
 
 # 配置SSH - 只允许密钥登录，禁用密码，启用SFTP
