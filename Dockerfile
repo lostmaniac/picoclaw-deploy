@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM debian:12
 
 # 设置非交互式安装
 ENV DEBIAN_FRONTEND=noninteractive
@@ -40,13 +40,13 @@ RUN apt-get update && apt-get install -y \
     eza \
     && rm -rf /var/lib/apt/lists/*
 
-# 安装Chromium浏览器
+# 安装Chromium浏览器（Debian 版本）
 RUN apt-get update && \
     apt-get install -y --no-install-recommends chromium && \
     rm -rf /var/lib/apt/lists/*
 
 # 验证Chromium安装
-RUN chromium-browser --version && \
+RUN chromium --version && \
     echo "Chromium installed successfully"
 
 # 配置SSH - 只允许密钥登录，禁用密码，启用SFTP
@@ -104,9 +104,9 @@ RUN ARCH=$(uname -m) && \
     picoclaw version && \
     picoclaw onboard
 
-# 设置 apt 国内源（清华源）- Ubuntu 24.04 使用 DEB822 格式
-RUN sed -i 's|URIs: http://archive.ubuntu.com/ubuntu|URIs: https://mirrors.tuna.tsinghua.edu.cn/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources && \
-    sed -i 's|URIs: http://security.ubuntu.com/ubuntu|URIs: https://mirrors.tuna.tsinghua.edu.cn/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources
+# 设置 apt 国内源（清华源）- Debian 12
+RUN sed -i 's|deb.debian.org|mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || \
+    sed -i 's|deb.debian.org|mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list 2>/dev/null || true
 
 # 设置 pip 国内源（清华源）
 RUN mkdir -p ~/.pip && \
