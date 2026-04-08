@@ -40,16 +40,17 @@ RUN apt-get update && apt-get install -y \
     eza \
     && rm -rf /var/lib/apt/lists/*
 
-# 安装Chrome浏览器
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome-keyring.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends google-chrome-stable && \
+# 安装Chromium浏览器（支持多架构）
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends chromium-browser && \
     rm -rf /var/lib/apt/lists/*
 
-# 配置Chrome为无头模式
-RUN google-chrome --version && \
-    echo "Chrome installed successfully"
+# 配置Chromium为无头模式
+RUN chromium-browser --version && \
+    echo "Chromium installed successfully"
+
+# 创建Chrome兼容性链接（为了兼容性）
+RUN ln -s /usr/bin/chromium-browser /usr/bin/google-chrome
 
 # 配置SSH - 只允许密钥登录，禁用密码，启用SFTP
 RUN mkdir /var/run/sshd && \
