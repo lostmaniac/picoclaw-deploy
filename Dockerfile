@@ -42,7 +42,7 @@ RUN apt-get update && apt-get install -y \
 
 # 安装Chromium浏览器（支持多架构）
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends chromium-browser && \
+    apt-get install -y --no-install-recommends chromium-browser fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 && \
     rm -rf /var/lib/apt/lists/*
 
 # 配置Chromium为无头模式
