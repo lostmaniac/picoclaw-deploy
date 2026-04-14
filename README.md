@@ -1,12 +1,19 @@
-# PicoClaw Dev Container
+# PicoClaw Deploy
 
 [PicoClaw](https://github.com/sipeed/picoclaw) 的开箱即用开发环境容器镜像，集成完整的 Linux 工具链和多平台 AI Agent 运行时，一行命令即可启动。
 
-## 为什么选择这个容器
+提供两个镜像变体：
+
+| 镜像 | 说明 |
+|------|------|
+| `ghcr.io/lostmaniac/picoclaw-browser` | 含 Chromium 浏览器（默认推荐） |
+| `ghcr.io/lostmaniac/picoclaw` | 精简版，无浏览器 |
+
+## 特性
 
 | 特性 | 说明 |
 |------|------|
-| **开箱即用** | 内置 PicoClaw、Node.js LTS、Python (uv)、Chromium、Git 等完整开发工具链，无需额外安装 |
+| **开箱即用** | 内置 PicoClaw、Node.js LTS、Python (uv)、Git 等完整开发工具链，无需额外安装 |
 | **多架构支持** | 同时支持 `linux/amd64` 和 `linux/arm64`，x86 服务器和 ARM 设备通用 |
 | **数据持久化** | 配置文件和工作目录通过 volume 挂载，容器重建不丢失数据 |
 | **自动更新** | 每日自动检测 PicoClaw 新版本并构建新镜像，始终保持最新 |
@@ -19,11 +26,11 @@
 ### 1. 创建目录并下载配置
 
 ```bash
-mkdir picoclaw-dev && cd picoclaw-dev
+mkdir picoclaw-deploy && cd picoclaw-deploy
 mkdir -p root data
 
 # 下载 docker-compose 文件
-curl -O https://raw.githubusercontent.com/lostmaniac/picoclaw-dev/main/docker-compose.yaml
+curl -O https://raw.githubusercontent.com/lostmaniac/picoclaw-deploy/main/docker-compose.yaml
 ```
 
 ### 2. 配置 SSH 公钥（可选）
@@ -44,10 +51,10 @@ docker compose up -d
 
 ```bash
 # 通过 Docker exec
-docker exec -it picoclaw-dev zsh
+docker exec -it picoclaw-deploy zsh
 
 # 或通过 SSH（需要先配置公钥）
-ssh -p <端口> root@<地址>
+ssh -p 2222 root@<地址>
 ```
 
 ## 配置说明
@@ -55,7 +62,7 @@ ssh -p <端口> root@<地址>
 ### 目录结构
 
 ```
-picoclaw-dev/
+picoclaw-deploy/
 ├── docker-compose.yaml
 ├── root/                    # 挂载到容器 /root（持久化用户数据）
 │   ├── .ssh/
@@ -65,15 +72,21 @@ picoclaw-dev/
 └── data/                    # 挂载到容器 /data（持久化工作数据）
 ```
 
-### 自定义端口映射
+### 使用无浏览器版本
 
-编辑 `docker-compose.yaml` 添加端口映射：
+编辑 `docker-compose.yaml`，将镜像替换为精简版：
+
+```yaml
+image: ghcr.io/lostmaniac/picoclaw:latest
+```
+
+### 自定义端口映射
 
 ```yaml
 services:
-  picoclaw-dev:
-    image: ghcr.io/lostmaniac/picoclaw-dev:latest
-    container_name: picoclaw-dev
+  picoclaw-deploy:
+    image: ghcr.io/lostmaniac/picoclaw-browser:latest
+    container_name: picoclaw-deploy
     volumes:
       - ./root:/root
       - ./data:/data
@@ -101,7 +114,7 @@ services:
 | PicoClaw | 最新 release 版本 |
 | Node.js | v22 LTS（通过 NVM 管理） |
 | Python | 通过 uv 管理 |
-| 浏览器 | Chromium |
+| 浏览器 | Chromium（仅 picoclaw-browser 镜像） |
 | Shell | bash / zsh / fish |
 | 编辑器 | vim / nano |
 | 工具 | git, tmux, htop, tree, jq, ripgrep, bat, fzf, curl, wget 等 |

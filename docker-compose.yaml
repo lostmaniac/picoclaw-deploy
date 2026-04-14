@@ -1,8 +1,10 @@
 services:
-  picoclaw-dev:
-    image: ghcr.io/lostmaniac/picoclaw-dev:latest
-    container_name: picoclaw-dev
+  picoclaw-deploy:
+    image: ghcr.io/lostmaniac/picoclaw-browser:latest
+    container_name: picoclaw-deploy
     volumes:
       - ./root:/root
       - ./data:/data
+    ports:
+      - "2222:22"
     restart: unless-stopped

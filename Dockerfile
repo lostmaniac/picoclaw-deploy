@@ -1,5 +1,8 @@
 FROM debian:13
 
+# 是否安装浏览器（true/false）
+ARG INSTALL_BROWSER=false
+
 # 设置非交互式安装
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -39,14 +42,14 @@ RUN apt-get update && apt-get install -y \
     bat \
     && rm -rf /var/lib/apt/lists/*
 
-# 安装Chromium浏览器（Debian 版本）
-RUN apt-get update && \
+# 安装Chromium浏览器（仅 browser 变体）
+RUN if [ "$INSTALL_BROWSER" = "true" ]; then \
+    apt-get update && \
     apt-get install -y --no-install-recommends chromium && \
-    rm -rf /var/lib/apt/lists/*
-
-# 验证Chromium安装
-RUN chromium --version && \
-    echo "Chromium installed successfully"
+    rm -rf /var/lib/apt/lists/* && \
+    chromium --version && \
+    echo "Chromium installed successfully"; \
+    fi
 
 # 配置SSH - 只允许密钥登录，禁用密码，启用SFTP
 RUN mkdir -p /var/run/sshd && \
