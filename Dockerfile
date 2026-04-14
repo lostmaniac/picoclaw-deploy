@@ -107,7 +107,7 @@ RUN ARCH=$(uname -m) && \
     picoclaw onboard
 
 # 安装 agent-browser
-RUN npm install -g agent-browser
+RUN . "$NVM_DIR/nvm.sh" && npm install -g agent-browser
 
 # 设置 apt 国内源（清华源）- Debian 13
 RUN sed -i 's|deb.debian.org|mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || \
