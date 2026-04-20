@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Fingerprint Spoof",
+  "version": "1.0",
+  "content_scripts": [
+    {
+      "js": ["spoof.js"],
+      "matches": ["<all_urls>"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ]
+}

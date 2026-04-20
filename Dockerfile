@@ -136,8 +136,9 @@ RUN mkdir -p /root.original && \
     cp -a /root/. /root.original/ && \
     rm -rf /root/.ssh/authorized_keys
 
-# 复制启动脚本
+# 复制启动脚本和浏览器指纹伪装扩展
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY chrome-extension/ /root/chrome-extension/
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # 启动SSH服务

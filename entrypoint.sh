@@ -45,15 +45,19 @@ echo "SSH service is running on port 22"
 
 # 启动Chromium无头模式（仅browser变体）
 if command -v chromium &>/dev/null; then
-    echo "Starting Chromium headless..."
+    echo "Starting Chromium headless (Mac M1 emulation)..."
     mkdir -p /root/browse_data
+    CHROME_VER=$(chromium --version | grep -oP '\d+\.\d+\.\d+\.\d+' | head -1)
     chromium \
-        --headless \
+        --headless=new \
         --disable-gpu \
         --no-sandbox \
+        --disable-blink-features=AutomationControlled \
         --remote-debugging-port=9222 \
         --user-data-dir=/root/browse_data \
         --window-size=1920,1080 \
+        --user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${CHROME_VER} Safari/537.36" \
+        --load-extension=/root/chrome-extension \
         &
 fi
 
