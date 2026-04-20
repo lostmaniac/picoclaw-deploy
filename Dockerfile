@@ -117,11 +117,7 @@ RUN . "$NVM_DIR/nvm.sh" && npm i chrome-devtools-mcp@latest -g
 
 # 注入 chrome-devtools MCP 服务器配置到 picoclaw config
 RUN CONFIG="/root/.picoclaw/config.json" && \
-    jq '.tools.mcp.servers["chrome-devtools"] = {
-      "args": ["chrome-devtools-mcp@latest", "--browser-url=http://127.0.0.1:9222", "--autoConnect"],
-      "command": "npx",
-      "enabled": true
-    }' "$CONFIG" > "${CONFIG}.tmp" && mv "${CONFIG}.tmp" "$CONFIG"
+    jq '.tools.mcp.servers["chrome-devtools"]={"args":["chrome-devtools-mcp@latest","--browser-url=http://127.0.0.1:9222","--autoConnect"],"command":"npx","enabled":true}' "$CONFIG" > "${CONFIG}.tmp" && mv "${CONFIG}.tmp" "$CONFIG"
 
 # 设置 apt 国内源（清华源）- Debian 13
 RUN sed -i 's|deb.debian.org|mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || \
