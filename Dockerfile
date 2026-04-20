@@ -49,8 +49,8 @@ RUN if [ "$INSTALL_BROWSER" = "true" ]; then \
         chromium \
         fonts-noto-cjk && \
     rm -rf /var/lib/apt/lists/* && \
-    chromium --headless --no-sandbox --disable-gpu --dump-dom about:blank > /dev/null && \
-    echo "Chromium headless + CJK fonts installed successfully"; \
+    chromium --version && \
+    echo "Chromium + CJK fonts installed successfully"; \
     fi
 
 # 配置SSH - 只允许密钥登录，禁用密码，启用SFTP
@@ -114,6 +114,14 @@ RUN ARCH=$(uname -m) && \
 
 # 安装 chrome-devtools-mcp
 RUN . "$NVM_DIR/nvm.sh" && npm i chrome-devtools-mcp@latest -g
+
+# 注入 chrome-devtools MCP 服务器配置到 picoclaw config
+RUN CONFIG="/root/.picoclaw/config.json" && \
+    jq '.tools.mcp.servers["chrome-devtools"] = {
+      "args": ["chrome-devtools-mcp@latest", "--browser-url=http://127.0.0.1:9222", "--autoConnect"],
+      "command": "npx",
+      "enabled": true
+    }' "$CONFIG" > "${CONFIG}.tmp" && mv "${CONFIG}.tmp" "$CONFIG"
 
 # 设置 apt 国内源（清华源）- Debian 13
 RUN sed -i 's|deb.debian.org|mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || \
