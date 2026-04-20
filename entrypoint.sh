@@ -47,15 +47,24 @@ echo "SSH service is running on port 22"
 if command -v chromium &>/dev/null; then
     echo "Starting Chromium headless (Mac M1 emulation)..."
     mkdir -p /root/browse_data
+
+    # 生成持久化的指纹种子（每个容器实例唯一，重启不变）
+    SEED_FILE=/root/browse_data/.fp_seed
+    if [ ! -f "$SEED_FILE" ]; then
+        od -An -N4 -tu4 /dev/urandom | tr -d ' \n' > "$SEED_FILE"
+    fi
+    echo "const INSTANCE_SEED = $(cat "$SEED_FILE");" > /root/chrome-extension/seed.js
+
     CHROME_VER=$(chromium --version | grep -oP '\d+\.\d+\.\d+\.\d+' | head -1)
     chromium \
         --headless=new \
         --disable-gpu \
         --no-sandbox \
         --disable-blink-features=AutomationControlled \
+        --force-device-scale-factor=2 \
         --remote-debugging-port=9222 \
         --user-data-dir=/root/browse_data \
-        --window-size=1920,1080 \
+        --window-size=1440,900 \
         --user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${CHROME_VER} Safari/537.36" \
         --load-extension=/root/chrome-extension \
         &

@@ -42,15 +42,19 @@ RUN apt-get update && apt-get install -y \
     bat \
     && rm -rf /var/lib/apt/lists/*
 
-# 安装Chromium无头浏览器和中文字体（仅 browser 变体）
+# 安装Chromium无头浏览器和字体（仅 browser 变体）
 RUN if [ "$INSTALL_BROWSER" = "true" ]; then \
     apt-get update && \
     apt-get install -y --no-install-recommends \
         chromium \
-        fonts-noto-cjk && \
+        fonts-noto-cjk \
+        fonts-liberation \
+        fonts-dejavu-core \
+        fonts-freefont-ttf \
+        fonts-noto-color-emoji && \
     rm -rf /var/lib/apt/lists/* && \
     chromium --version && \
-    echo "Chromium + CJK fonts installed successfully"; \
+    echo "Chromium + fonts installed successfully"; \
     fi
 
 # 配置SSH - 只允许密钥登录，禁用密码，启用SFTP
@@ -114,12 +118,14 @@ RUN ARCH=$(uname -m) && \
     cp -r /tmp/chrome-devtools-mcp/skills/* /root/.picoclaw/workspace/skills/ && \
     rm -rf /tmp/chrome-devtools-mcp
 
-# 安装 chrome-devtools-mcp
-RUN . "$NVM_DIR/nvm.sh" && npm i chrome-devtools-mcp@latest -g
-
 # 注入 chrome-devtools MCP 服务器配置到 picoclaw config
 RUN CONFIG="/root/.picoclaw/config.json" && \
     jq '.tools.mcp.servers["chrome-devtools"]={"args":["chrome-devtools-mcp@latest","--browser-url=http://127.0.0.1:9222","--autoConnect"],"command":"npx","enabled":true}' "$CONFIG" > "${CONFIG}.tmp" && mv "${CONFIG}.tmp" "$CONFIG"
+
+# 安装 chrome-devtools-mcp（仅 browser 变体）
+RUN if [ "$INSTALL_BROWSER" = "true" ]; then \
+        . "$NVM_DIR/nvm.sh" && npm i chrome-devtools-mcp@latest -g; \
+    fi
 
 # 设置 apt 国内源（清华源）- Debian 13
 RUN sed -i 's|deb.debian.org|mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || \
@@ -131,15 +137,19 @@ RUN mkdir -p ~/.pip && \
     echo 'index-url = https://pypi.tuna.tsinghua.edu.cn/simple' >> ~/.pip/pip.conf && \
     echo 'trusted-host = pypi.tuna.tsinghua.edu.cn' >> ~/.pip/pip.conf
 
-# 创建root目录备份，用于首次挂载时初始化
+# 复制启动脚本
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+
+# 复制浏览器指纹伪装扩展（仅 browser 变体）
+COPY chrome-extension/ /root/chrome-extension/
+RUN if [ "$INSTALL_BROWSER" = "false" ]; then rm -rf /root/chrome-extension; fi
+
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# 创建root目录备份（必须在所有文件复制之后）
 RUN mkdir -p /root.original && \
     cp -a /root/. /root.original/ && \
     rm -rf /root/.ssh/authorized_keys
-
-# 复制启动脚本和浏览器指纹伪装扩展
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-COPY chrome-extension/ /root/chrome-extension/
-RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # 启动SSH服务
 CMD ["/usr/local/bin/entrypoint.sh"]

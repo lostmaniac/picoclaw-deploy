@@ -4,7 +4,7 @@
   "version": "1.0",
   "content_scripts": [
     {
-      "js": ["spoof.js"],
+      "js": ["seed.js", "spoof.js"],
       "matches": ["<all_urls>"],
       "run_at": "document_start",
       "world": "MAIN"
