@@ -137,6 +137,9 @@ RUN if [ "$INSTALL_BROWSER" = "true" ]; then \
         . "$NVM_DIR/nvm.sh" && npm i chrome-devtools-mcp@latest -g; \
     fi
 
+# 安装 bocha-search-mcp
+RUN git clone https://github.com/BochaAI/bocha-search-mcp.git /mcp/bocha-search-mcp
+
 # 设置 apt 国内源（清华源）- Debian 13
 RUN sed -i 's|deb.debian.org|mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || \
     sed -i 's|deb.debian.org|mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list 2>/dev/null || true
